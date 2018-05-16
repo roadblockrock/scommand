@@ -4,35 +4,33 @@ using UnityEngine;
 
 public class SlimeController : MonoBehaviour {
 
-    bool isSelected;
     bool mouseOver = false;
+    Selectable mySelectable;
+    SelectionController selectionController;
     SpriteRenderer mySpriteRenderer;
 
-	// Use this for initialization
-	void Start () {
-		isSelected = false;
+    private void Awake()
+    {
+        mySelectable = gameObject.GetComponent<Selectable>();
+        selectionController = (SelectionController)Object.FindObjectOfType<SelectionController>();
+    }
+
+    // Use this for initialization
+    void Start () {
         mySpriteRenderer = GetComponent<SpriteRenderer>();
 
         // Lock to grid
         Vector3 myPos = transform.position;
-        transform.position = new Vector3(Mathf.Round(myPos.x) , Mathf.Round(myPos.y) , myPos.z);
+        transform.position = new Vector3(Mathf.Round(myPos.x) + 0.5f , Mathf.Round(myPos.y) + 0.5f , myPos.z);
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        // Check if object has been deselected
-        if (Input.GetMouseButton(0))
-            if (!mouseOver)
-            {
-                this.isSelected = false;
-            }
-
         // If Object is selected...
-        if (this.isSelected)
+        if (this.mySelectable.getSelected())
         {
-            // Set Selected Color
-            mySpriteRenderer.color = Color.red;
+            
 
             // Move the slime
             float xMove = 0;
@@ -55,11 +53,7 @@ public class SlimeController : MonoBehaviour {
             }
             transform.position += new Vector3(xMove, yMove, 0.0f);
         }
-        else
-        {
-            // Not selected so make color normal
-            mySpriteRenderer.color = Color.white;
-        }
+       
 
         
            
@@ -75,17 +69,20 @@ public class SlimeController : MonoBehaviour {
     void OnMouseDown()
     {
         print("Clicked!");
-        this.isSelected = true;
+        selectionController.setSelected(gameObject);
     }
 
-    private void OnMouseOver()
+
+    private void Selected()
     {
-        this.mouseOver = true;
+        // Set Selected Color
+        mySpriteRenderer.color = Color.red;
     }
 
-    private void OnMouseExit()
+    private void Deselected()
     {
-        this.mouseOver = false;
+        // Not selected so make color normal
+        mySpriteRenderer.color = Color.white;
     }
 
 
